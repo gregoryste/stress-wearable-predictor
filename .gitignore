@@ -1,0 +1,13 @@
+# Cache do Python e pytest
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Ambientes virtuais e variáveis locais
+.venv/
+venv/
+.env
+
+# Datasets pesados (evita subir o WESAD sem querer depois)
+*.pkl
+*.zip
