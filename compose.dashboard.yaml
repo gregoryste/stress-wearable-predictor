@@ -1,0 +1,13 @@
+services:
+  dashboard:
+    build: ./dashboard
+    ports:
+      - "127.0.0.1:8501:8501"
+    environment:
+      PGHOST: banco
+      PGDATABASE: iot
+      PGUSER: jackson
+      PGPASSWORD: "${POSTGRES_PASSWORD:?Configure a senha no arquivo .env}"
+    depends_on:
+      banco:
+        condition: service_healthy
