@@ -1,0 +1,24 @@
+name: iot-estresse
+services:
+  mqtt:
+    image: eclipse-mosquitto:2
+    ports:
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ./infra/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+  banco:
+    image: timescale/timescaledb:latest-pg16
+    environment:
+      POSTGRES_DB: iot
+      POSTGRES_USER: jackson
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Configure a senha no arquivo .env}"
+    volumes:
+      - historico:/var/lib/postgresql/data
+      - ./infra/banco/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "jackson", "-d", "iot"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+volumes:
+  historico:
