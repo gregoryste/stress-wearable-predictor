@@ -1,0 +1,10 @@
+CREATE SCHEMA IF NOT EXISTS demo;
+
+CREATE TABLE IF NOT EXISTS demo.mensagens_mqtt (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    topico TEXT NOT NULL,
+    usuario TEXT NOT NULL,
+    timestamp_mensagem TIMESTAMPTZ NOT NULL,
+    recebido_em TIMESTAMPTZ NOT NULL DEFAULT now(),
+    payload JSONB NOT NULL
+);
