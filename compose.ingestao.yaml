@@ -1,0 +1,14 @@
+services:
+  ingestao:
+    build: ./ingestao
+    restart: unless-stopped
+    environment:
+      PGHOST: banco
+      PGDATABASE: iot
+      PGUSER: jackson
+      PGPASSWORD: "${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD no .env}"
+    depends_on:
+      banco:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
