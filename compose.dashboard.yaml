@@ -6,6 +6,7 @@ services:
     environment:
       PGHOST: banco
       PGDATABASE: iot
+      DASHBOARD_FONTE: "${DASHBOARD_FONTE:-exemplo}"
       PGUSER: jackson
       PGPASSWORD: "${POSTGRES_PASSWORD:?Configure a senha no arquivo .env}"
     depends_on:
