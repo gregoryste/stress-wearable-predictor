@@ -1,0 +1,7 @@
+# Dependências do treino do modelo (rodam só na máquina de quem treina).
+# Inclui as do projeto (numpy, scipy, scikit-learn...), porque o treino usa
+# shared/features.py e o contrato, e o modelo precisa abrir na API com as
+# mesmas versões.
+-r ../requirements.txt
+pandas==3.1.1
+matplotlib==3.11.2
