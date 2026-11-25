@@ -72,6 +72,21 @@ def test_pares_ligam_janelas_com_60_s_de_diferenca():
     assert (pares.participante == "S2").all()
 
 
+def test_comparar_modelos_avalia_todos_no_mesmo_protocolo(tmp_path):
+    from treino.comparar_modelos import candidatos, comparar
+
+    tabela = tmp_path / "features.csv"
+    tabela_sintetica().to_csv(tabela, index=False)
+    resultado = comparar(tabela)
+
+    assert set(resultado["modelos"]) == set(candidatos())
+    for medidas in resultado["modelos"].values():
+        assert 0 <= medidas["f1_macro"] <= 100
+        assert 0 <= medidas["f1_pior_participante"] <= 100
+    # Com o padrão pessoal, os estados sintéticos são fáceis para as árvores.
+    assert resultado["modelos"]["Random Forest (atual, folha mínima 3)"]["f1_macro"] > 90
+
+
 def test_treinar_gera_modelo_metadados_metricas_e_graficos(tmp_path):
     tabela = tmp_path / "features.csv"
     tabela_sintetica().to_csv(tabela, index=False)

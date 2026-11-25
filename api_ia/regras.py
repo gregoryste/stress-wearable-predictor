@@ -16,6 +16,10 @@ from contratos.api import Intervencao
 LIMIAR_ESTRESSE = 0.5
 # Quantas janelas recentes entram no cálculo da tendência.
 JANELAS_TENDENCIA = 3
+# O alerta de estresse só sai após tantas janelas seguidas de estresse. Na simulação
+# com os 15 participantes do WESAD, exigir 2 janelas cortou cerca de um terço dos
+# alarmes falsos e manteve o alerta para todos (a cobertura do estresse caiu de 90% para 85%).
+JANELAS_CONFIRMACAO = 2
 # Estresse por tantas janelas seguidas (cerca de 10 minutos) pede uma pausa maior.
 JANELAS_ESTRESSE_LONGO = 10
 # Um intervalo maior que este entre duas janelas começa uma nova sessão.
@@ -78,7 +82,8 @@ def prever_proxima(registros: list[Registro], probabilidades: dict[str, float]) 
 def escolher_intervencao(registros: list[Registro], proxima_janela: str) -> Intervencao:
     """Intervenção sugerida, da mais leve à mais forte.
 
-    - estresse agora, por pouco tempo -> respiração guiada
+    - estresse em 1 janela só -> nenhuma (aguarda confirmação; evita alarme por um pico isolado)
+    - estresse por ``JANELAS_CONFIRMACAO`` janelas seguidas -> respiração guiada
     - estresse por ``JANELAS_ESTRESSE_LONGO`` janelas seguidas -> pausa ativa
     - sem estresse agora, mas tendência de estresse -> aviso antecipado
     - caso contrário -> nenhuma
@@ -95,7 +100,9 @@ def escolher_intervencao(registros: list[Registro], proxima_janela: str) -> Inte
             seguidas += 1
         if seguidas >= JANELAS_ESTRESSE_LONGO:
             return Intervencao.pausa_ativa
-        return Intervencao.respiracao_guiada
+        if seguidas >= JANELAS_CONFIRMACAO:
+            return Intervencao.respiracao_guiada
+        return Intervencao.nenhuma
     if proxima_janela == "estresse":
         return Intervencao.aviso_antecipado
     return Intervencao.nenhuma
