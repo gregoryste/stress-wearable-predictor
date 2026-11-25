@@ -1,0 +1,17 @@
+{
+  "usuario": "S2",
+  "fim_janela": "2026-11-27T14:04:00Z",
+  "duracao_s": 60,
+  "features": {
+    "fc_media": 92.0,
+    "fc_desvio": 6.3,
+    "hrv_rmssd": 24.0,
+    "hrv_sdnn": 38.5,
+    "eda_media": 0.52,
+    "eda_picos": 6,
+    "eda_inclinacao": 0.04,
+    "temp_media": 32.8,
+    "temp_inclinacao": -0.10,
+    "movimento_media": 0.03
+  }
+}

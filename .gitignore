@@ -14,3 +14,9 @@ venv/
 *.pkl
 *.zip
 data/
+
+# Dataset WESAD descompactado na raiz (16 GB; baixar pelo link oficial)
+WESAD/
+
+# Arquivos do macOS
+.DS_Store
