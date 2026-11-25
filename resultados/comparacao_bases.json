@@ -1,0 +1,91 @@
+{
+  "janelas": {
+    "wesad": {
+      "repouso": 1221,
+      "estresse": 903,
+      "diversao": 465
+    },
+    "physionet": {
+      "exercicio": 7009,
+      "repouso": 3343,
+      "estresse": 863
+    },
+    "participantes": {
+      "wesad": 15,
+      "physionet": 33
+    }
+  },
+  "cruzado": {
+    "treino_wesad_teste_physionet": {
+      "janelas": 4206,
+      "f1_estresse": 37.8,
+      "acuracia_balanceada": 60.4,
+      "auc": 0.629
+    },
+    "treino_physionet_teste_wesad": {
+      "janelas": 2589,
+      "f1_estresse": 63.5,
+      "acuracia_balanceada": 69.7,
+      "auc": 0.77
+    }
+  },
+  "exercicio_modelo_so_wesad": {
+    "janelas": 7009,
+    "chamado_de_estresse_pct": 90.8
+  },
+  "loso": {
+    "so_wesad_no_wesad": {
+      "janelas": 2589,
+      "f1_estresse": 93.0,
+      "acuracia_balanceada": 94.7
+    },
+    "combinado_no_wesad": {
+      "janelas": 2589,
+      "f1_estresse": 49.3,
+      "acuracia_balanceada": 64.1
+    },
+    "combinado_no_physionet_estresse": {
+      "janelas": 4206,
+      "f1_estresse": 44.9,
+      "acuracia_balanceada": 64.9
+    },
+    "combinado_exercicio": {
+      "janelas": 7009,
+      "chamado_de_estresse_pct": 5.6,
+      "reconhecido_como_exercicio_pct": 89.9
+    },
+    "combinado_wesad_estresse_chamado_de_exercicio_pct": 57.8
+  },
+  "supressao_por_exercicio": [
+    {
+      "limiar_exercicio": 0.5,
+      "f1_estresse_wesad": 52.5,
+      "f1_estresse_physionet": 45.6,
+      "exercicio_chamado_de_estresse_pct": 7.8
+    },
+    {
+      "limiar_exercicio": 0.7,
+      "f1_estresse_wesad": 66.1,
+      "f1_estresse_physionet": 48.0,
+      "exercicio_chamado_de_estresse_pct": 17.0
+    },
+    {
+      "limiar_exercicio": 0.8,
+      "f1_estresse_wesad": 73.8,
+      "f1_estresse_physionet": 48.6,
+      "exercicio_chamado_de_estresse_pct": 25.0
+    },
+    {
+      "limiar_exercicio": 0.9,
+      "f1_estresse_wesad": 82.9,
+      "f1_estresse_physionet": 49.0,
+      "exercicio_chamado_de_estresse_pct": 39.2
+    },
+    {
+      "limiar_exercicio": "nunca suprime",
+      "f1_estresse_wesad": 86.7,
+      "f1_estresse_physionet": 49.2,
+      "exercicio_chamado_de_estresse_pct": 84.5
+    }
+  ]
+}
