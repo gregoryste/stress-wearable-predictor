@@ -1,0 +1,24 @@
+# Mantém o contexto de build pequeno quando uma imagem é montada a partir da raiz
+# do repositório (necessário para os serviços importarem shared/ e contratos/).
+
+# Dataset e dados locais (o WESAD tem 16 GB)
+WESAD/
+data/
+
+# Ambientes virtuais, caches e Git
+.venv/
+venv/
+.git/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Segredos e variáveis locais (o compose passa as variáveis; nenhuma imagem copia o .env)
+.env
+.env.*
+
+# O que não vai para dentro de nenhuma imagem
+.github/
+contexto/
+tests/
+.DS_Store
