@@ -65,11 +65,13 @@ def test_repouso_da_propria_pessoa_e_repouso(servico):
     assert predicao.intervencao == Intervencao.nenhuma
 
 
-def test_estresse_tipico_e_estresse_e_sugere_respiracao(servico):
-    predicao = servico.prever(janela(servico, estresse=1.0))
-    assert predicao.estado.value == "estresse"
-    assert predicao.probabilidade > 0.5
-    assert predicao.intervencao == Intervencao.respiracao_guiada
+def test_estresse_tipico_e_confirmado_na_segunda_janela_seguida(servico):
+    primeira = servico.prever(janela(servico, minuto=0, estresse=1.0))
+    assert primeira.estado.value == "estresse"
+    assert primeira.probabilidade > 0.5
+    assert primeira.intervencao == Intervencao.nenhuma          # aguarda confirmação
+    segunda = servico.prever(janela(servico, minuto=1, estresse=1.0))
+    assert segunda.intervencao == Intervencao.respiracao_guiada
 
 
 def test_usuario_sem_calibracao_tambem_recebe_predicao_valida(servico):
@@ -126,6 +128,13 @@ def test_estavel_sem_estresse_nao_gera_intervencao():
     assert proxima == "repouso"
     assert confianca == pytest.approx(0.9)
     assert escolher_intervencao(historico, proxima) == Intervencao.nenhuma
+
+
+def test_pico_isolado_de_estresse_nao_gera_alerta():
+    pico = registros(0.1, 0.1, 0.9)
+    assert escolher_intervencao(pico, "estresse") == Intervencao.nenhuma
+    depois_do_pico = registros(0.1, 0.9, 0.1)
+    assert escolher_intervencao(depois_do_pico, "repouso") == Intervencao.nenhuma
 
 
 def test_estresse_curto_respiracao_e_longo_pausa_ativa():

@@ -1,0 +1,68 @@
+{
+  "protocolo": "padrão pessoal (5 min de calibração), leave-one-subject-out, 2589 janelas, 15 participantes",
+  "modelos": {
+    "Random Forest (atual, folha mínima 3)": {
+      "f1_macro": 81.89,
+      "acuracia": 86.6,
+      "f1_estresse": 93.04,
+      "f1_diversao": 62.4,
+      "f1_pior_participante": 61.22,
+      "f1_desvio_entre_participantes": 12.24,
+      "tempo_s": 4.6
+    },
+    "Random Forest, folha mínima 1": {
+      "f1_macro": 83.55,
+      "acuracia": 87.99,
+      "f1_estresse": 93.38,
+      "f1_diversao": 65.72,
+      "f1_pior_participante": 61.22,
+      "f1_desvio_entre_participantes": 11.56,
+      "tempo_s": 4.3
+    },
+    "Random Forest, folha mínima 10": {
+      "f1_macro": 82.14,
+      "acuracia": 86.33,
+      "f1_estresse": 93.22,
+      "f1_diversao": 63.45,
+      "f1_pior_participante": 61.22,
+      "f1_desvio_entre_participantes": 12.6,
+      "tempo_s": 4.2
+    },
+    "Extra Trees": {
+      "f1_macro": 80.65,
+      "acuracia": 87.37,
+      "f1_estresse": 94.6,
+      "f1_diversao": 56.55,
+      "f1_pior_participante": 60.28,
+      "f1_desvio_entre_participantes": 13.99,
+      "tempo_s": 3.2
+    },
+    "Gradient Boosting (histograma)": {
+      "f1_macro": 80.71,
+      "acuracia": 85.63,
+      "f1_estresse": 88.23,
+      "f1_diversao": 62.77,
+      "f1_pior_participante": 57.92,
+      "f1_desvio_entre_participantes": 13.99,
+      "tempo_s": 28.0
+    },
+    "Regressão logística": {
+      "f1_macro": 72.12,
+      "acuracia": 75.28,
+      "f1_estresse": 89.42,
+      "f1_diversao": 49.61,
+      "f1_pior_participante": 48.63,
+      "f1_desvio_entre_participantes": 12.59,
+      "tempo_s": 0.2
+    },
+    "k vizinhos (k=15)": {
+      "f1_macro": 71.08,
+      "acuracia": 78.41,
+      "f1_estresse": 87.91,
+      "f1_diversao": 41.77,
+      "f1_pior_participante": 48.25,
+      "f1_desvio_entre_participantes": 9.8,
+      "tempo_s": 0.1
+    }
+  }
+}
