@@ -1,0 +1,10 @@
+{
+  "usuario": "S2",
+  "fim_janela": "2026-11-27T14:04:00Z",
+  "estado": "estresse",
+  "probabilidade": 0.81,
+  "proxima_janela": "estresse",
+  "prob_proxima": 0.74,
+  "intervencao": "respiracao_guiada",
+  "versao_modelo": "falso-v0"
+}
