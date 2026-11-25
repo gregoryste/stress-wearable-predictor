@@ -1,6 +1,8 @@
 services:
   ingestao:
-    build: ./ingestao
+    build:
+      context: .
+      dockerfile: ingestao/Dockerfile
     restart: unless-stopped
     environment:
       PGHOST: banco
