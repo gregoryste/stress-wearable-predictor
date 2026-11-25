@@ -2,7 +2,7 @@
 
 Material da parte de IA para o relatório técnico. Cobre as seções **Desenvolvimento e Funcionalidades** (parte de IA) e **Análise de Resultados**. Todos os números vêm dos arquivos desta pasta (`metricas.json`, `simulacao_api.json`, `simulacao_api_janelas.csv`, `comparacao_bases.json`) e podem ser reproduzidos com os comandos do final.
 
-**Resumo.** O sistema identifica estresse a partir de quatro sinais de uma pulseira (pulso, condutância da pele, temperatura e movimento). Comparando cada pessoa com o próprio repouso, o modelo acerta **86,6%** das janelas de 1 minuto entre repouso, estresse e diversão (**F1 81,9**), contra F1 de 64,1 do artigo original do dataset. Na simulação de uso real pela API, **todos os 15 participantes** receberam alerta durante o estresse, com **2,5 alertas falsos por hora** em repouso e diversão e **28 ms** por resposta. A principal limitação aparece fora das condições do experimento: em transições e questionários, o modelo alerta com frequência (25 por hora). Uma **segunda base pública** (PhysioNet, 33 participantes, com sessões de exercício) confirmou e mediu esse limite: o modelo generaliza mal para outro estudo (F1 do estresse 37,8) e chama **91% dos minutos de exercício** de estresse. Ensinar o que é exercício resolve esse erro, mas derruba a detecção do estresse intenso do WESAD; só com sinais do pulso, os dois são parecidos demais.
+**Resumo.** O sistema identifica estresse a partir de quatro sinais de uma pulseira (pulso, condutância da pele, temperatura e movimento). Comparando cada pessoa com o próprio repouso, o modelo acerta **86,6%** das janelas de 1 minuto entre repouso, estresse e diversão (**F1 81,9**), contra F1 de 64,1 do artigo original do dataset. Na simulação de uso real pela API, **todos os 15 participantes** receberam alerta durante o estresse, com **1,7 alertas falsos por hora** em repouso e diversão e **28 ms** por resposta, graças a uma regra que só alerta após 2 minutos seguidos de estresse. O Random Forest foi comparado com outros seis modelos e ficou entre os melhores. A principal limitação aparece fora das condições do experimento: em transições e questionários, o modelo ainda alerta com frequência (17 por hora). Uma **segunda base pública** (PhysioNet, 33 participantes, com sessões de exercício) confirmou e mediu esse limite: o modelo generaliza mal para outro estudo (F1 do estresse 37,8) e chama **91% dos minutos de exercício** de estresse. Ensinar o que é exercício resolve esse erro, mas derruba a detecção do estresse intenso do WESAD; só com sinais do pulso, os dois são parecidos demais.
 
 ---
 
@@ -14,7 +14,7 @@ A parte de IA transforma um minuto de sinais brutos numa decisão, em cinco etap
 2. **Features:** os sinais da janela viram 10 números-resumo, como frequência cardíaca e picos de condutância da pele (`extrair_features`). O mesmo código roda no treino e ao vivo, para o modelo receber ao vivo exatamente o tipo de dado com que aprendeu.
 3. **Modelo:** um Random Forest classifica a janela em repouso, estresse ou diversão (`treino/treinar.py`, servido por `api_ia/modelo.py`).
 4. **Tendência:** a API guarda as últimas janelas de cada usuário e projeta a probabilidade de estresse do minuto seguinte (`api_ia/regras.py`).
-5. **Intervenção:** regras simples escolhem o que sugerir ao usuário (`api_ia/regras.py`).
+5. **Intervenção:** regras simples escolhem o que sugerir ao usuário, e o alerta de estresse só sai após 2 minutos seguidos de estresse (`api_ia/regras.py`).
 
 A API recebe as features em `POST /prever` e devolve estado, probabilidade, previsão do próximo minuto e intervenção, no formato definido em `contratos/api.py`.
 
@@ -84,6 +84,20 @@ O padrão pessoal melhora o resultado em 13 dos 15 participantes, empata no S13 
 
 As decisões se apoiam sobretudo na condutância da pele (média e picos), na temperatura e na frequência cardíaca. A variabilidade cardíaca quase não pesa, coerente com a seção 3.
 
+**Comparação com outros modelos** (`treino/comparar_modelos.py`, mesmo protocolo: padrão pessoal e leave-one-subject-out):
+
+| Modelo | F1 macro | Acurácia | F1 do estresse | Pior participante |
+|---|---|---|---|---|
+| **Random Forest (escolhido)** | **81,9** | 86,6 | 93,0 | 61,2 |
+| Random Forest, folha mínima 1 | 83,5 | 88,0 | 93,4 | 61,2 |
+| Random Forest, folha mínima 10 | 82,1 | 86,3 | 93,2 | 61,2 |
+| Extra Trees | 80,7 | 87,4 | 94,6 | 60,3 |
+| Gradient Boosting (histograma) | 80,7 | 85,6 | 88,2 | 57,9 |
+| Regressão logística | 72,1 | 75,3 | 89,4 | 48,6 |
+| k vizinhos (k = 15) | 71,1 | 78,4 | 87,9 | 48,2 |
+
+Os modelos baseados em árvores ficam entre 80,7 e 83,5 de F1, cerca de 10 pontos acima dos modelos linear e de vizinhos: as interações entre as features importam, o que justifica a escolha. Mantivemos o Random Forest com folha mínima 3: a melhor variação ganha só 1,6 ponto, e escolher o modelo pelo mesmo resultado de validação deixa essa diferença otimista, dentro do que pode ser acaso.
+
 ## 6. O sistema funcionando: resultados pela API
 
 Os resultados da seção 5 avaliam janelas soltas. Para avaliar o **sistema**, simulamos o uso real (`treino/simular_api.py`): a sessão inteira de cada participante foi cortada em minutos seguidos e enviada, em ordem, para `POST /prever`, como a ingestão fará ao vivo. Cada participante foi simulado com um modelo treinado **sem ele**; dele, só entrou a calibração de 5 minutos.
@@ -94,29 +108,31 @@ Os resultados da seção 5 avaliam janelas soltas. Para avaliar o **sistema**, s
 | Acerto nos minutos com rótulo | 85,1% em média |
 | Participantes que receberam alerta durante o estresse | **15 de 15** |
 | Quando vem o primeiro alerta | Na mediana, já na **primeira janela inteira de estresse** (até cerca de 2 minutos após o início) |
-| Minutos de estresse com alerta | 89,8% em média |
-| Alertas falsos em repouso e diversão | 15 em 361 minutos: **2,5 por hora** |
-| Alertas em trechos sem rótulo (transições, questionários, meditação) | 392 em 929 minutos: **25 por hora** |
-| Tempo de resposta da API | **27,5 ms** na mediana, 29 ms no pior 5% (medido no próprio processo, sem rede) |
+| Minutos de estresse com alerta | 85,1% em média |
+| Alertas falsos em repouso e diversão | 10 em 361 minutos: **1,7 por hora** |
+| Alertas em trechos sem rótulo (transições, questionários, meditação) | 266 em 929 minutos: **17 por hora** |
+| Tempo de resposta da API | **27,6 ms** na mediana, 29,6 ms no pior 5% (medido no próprio processo, sem rede) |
+
+Esses números já incluem a **regra de confirmação** (seção 7): o alerta de estresse só sai após 2 minutos seguidos de estresse. Sem ela, os alertas falsos eram 2,5 por hora em repouso e diversão e 25 por hora nos trechos sem rótulo, com 89,8% do estresse coberto. A regra cortou cerca de um terço dos alarmes falsos e não atrasou o primeiro alerta na maioria dos participantes, porque o minuto anterior ao estresse muitas vezes já é classificado como estresse e serve de confirmação.
 
 ![Linha do tempo do S2](linha_do_tempo_S2.png)
 
-O gráfico mostra a sessão inteira do S2: as faixas coloridas são as condições reais, a linha é a probabilidade de estresse calculada pela API e os pontos no alto são as intervenções. No repouso, a probabilidade fica perto de zero; no estresse, sobe e oscila. Os picos nas faixas brancas são os alertas em trechos sem rótulo, discutidos na seção 8.
+O gráfico mostra a sessão inteira do S2: as faixas coloridas são as condições reais, a linha é a probabilidade de estresse calculada pela API e os pontos no alto são as intervenções. No repouso, a probabilidade fica perto de zero; no estresse, sobe e oscila. Os picos nas faixas brancas são os alertas em trechos sem rótulo, discutidos na seção 9.
 
 **Minuto a minuto, o início do estresse do S2** (dados reais da simulação):
 
 | Minuto | Condição real | Estado previsto | Prob. de estresse | Intervenção |
 |---|---|---|---|---|
 | 36 | sem rótulo | diversão | 10% | nenhuma |
-| 37 | sem rótulo (transição para o estresse) | estresse | 85% | respiração guiada |
+| 37 | sem rótulo (transição para o estresse) | estresse | 85% | nenhuma (aguarda confirmação) |
 | 38 | estresse | diversão | 3% | nenhuma |
 | 39 | estresse | diversão | 41% | nenhuma |
-| 40 | estresse | estresse | 58% | respiração guiada |
-| 41 | estresse | estresse | 41% | respiração guiada |
+| 40 | estresse | estresse | 58% | nenhuma (aguarda confirmação) |
+| 41 | estresse | estresse | 41% | **respiração guiada** |
 | 42 | estresse | repouso | 28% | nenhuma |
-| 43 | estresse | estresse | 41% | respiração guiada |
+| 43 | estresse | estresse | 41% | nenhuma (aguarda confirmação) |
 
-No S2, o primeiro alerta dentro do estresse veio no 3º minuto da condição (minuto 40), e a classificação oscila entre estresse e diversão. O S2 está abaixo da média (F1 74, contra 79): em 13 dos 15 participantes, o primeiro alerta vem já no 1º minuto de estresse.
+O S2 é um caso difícil: a classificação oscila entre estresse, diversão e repouso, e a regra de confirmação só dispara quando há 2 minutos seguidos de estresse (minutos 40 e 41). Com isso, o primeiro alerta veio no 4º minuto da condição. Sem a regra, o pico isolado do minuto 37 teria gerado um alerta antes de a tarefa de estresse começar. O S2 está abaixo da média (F1 74, contra 79): em 13 dos 15 participantes, o primeiro alerta vem já no 1º minuto de estresse; no S9, no 3º.
 
 ## 7. Previsão do próximo minuto e intervenções
 
@@ -128,8 +144,11 @@ No S2, o primeiro alerta dentro do estresse veio no 3º minuto da condição (mi
 |---|---|
 | Sem estresse e sem tendência de subida | nenhuma |
 | Sem estresse agora, mas a projeção do próximo minuto passa de 50% | **aviso antecipado** |
-| Estresse no minuto atual | **respiração guiada** (2 a 3 minutos, cerca de 6 respirações por minuto) |
+| Estresse em 1 minuto só | nenhuma (aguarda confirmação: evita alarme por um pico isolado) |
+| Estresse por 2 minutos seguidos | **respiração guiada** (2 a 3 minutos, cerca de 6 respirações por minuto) |
 | Estresse por 10 minutos seguidos | **pausa ativa** |
+
+A regra de confirmação foi escolhida comparando, na simulação da seção 6, seis formas de decidir o alerta: alertar a cada minuto, 2 minutos seguidos, 2 dos últimos 3 minutos e médias móveis da probabilidade com limiares diferentes. "2 minutos seguidos" foi a única que reduziu os alarmes falsos mantendo o alerta para os 15 participantes; as médias móveis que reduziam tanto quanto ela deixavam 2 participantes sem alerta no estresse.
 
 Duas intervenções da proposta ficam fora da API: o **ajuste do ambiente** depende do ruído e da temperatura da sala, e o **encaminhamento** a um profissional depende de um padrão de vários dias. Nenhum dos dois chega à API por janela; podem ficar no dashboard.
 
@@ -187,10 +206,10 @@ Na bicicleta, o punho fica apoiado no guidão: o acelerômetro quase não distin
 
 ## 9. Limitações
 
-1. **Alertas fora das condições do experimento.** O modelo só conhece repouso, estresse e diversão. Nas transições (andar entre salas, responder questionários) e na meditação, a fisiologia muda e o modelo alerta em 25 por hora. Parte disso pode ser ativação real (no S2, o pico do minuto 37 acontece logo antes do início do estresse rotulado), mas o WESAD não permite separar. A segunda base mostrou o caso extremo: **91% dos minutos de exercício viram alerta** (seção 8). Em uso real, onde a pessoa anda, sobe escadas e se exercita, esse é o principal risco.
-   - **Ajuste testado:** só alertar após **2 minutos seguidos** de estresse reduz os alertas em repouso e diversão de 2,5 para 1,7 por hora e, nos trechos sem rótulo, de 25 para 17 por hora. Todos os 15 continuam recebendo alerta, mas a parte do estresse coberta cai de 90% para 85%. Outras saídas: o "modo exercício" e o reconhecimento de atividade pelo acelerômetro (seção 8).
+1. **Alertas fora das condições do experimento.** O modelo só conhece repouso, estresse e diversão. Nas transições (andar entre salas, responder questionários) e na meditação, a fisiologia muda e o modelo alerta em 17 por hora, mesmo com a regra de confirmação (25 por hora sem ela). Parte disso pode ser ativação real (no S2, o pico do minuto 37 acontece logo antes do início do estresse rotulado), mas o WESAD não permite separar. A segunda base mostrou o caso extremo: **91% dos minutos de exercício viram alerta** (seção 8). Em uso real, onde a pessoa anda, sobe escadas e se exercita, esse é o principal risco.
+   - **Ajuste aplicado:** só alertar após **2 minutos seguidos** de estresse (seção 7) reduziu os alertas em repouso e diversão de 2,5 para 1,7 por hora e, nos trechos sem rótulo, de 25 para 17 por hora. Todos os 15 continuam recebendo alerta, mas a parte do estresse coberta caiu de 90% para 85%. Regras mais elaboradas (médias móveis) não fizeram melhor: o limite agora está no modelo e no contexto, não na regra. Próximas saídas: o "modo exercício" e o reconhecimento de atividade pelo acelerômetro (seção 8).
 2. **Generalização entre estudos:** treinado no WESAD e testado em outro estudo, o F1 do estresse cai de 93,0 para 37,8 (seção 8). Parte da queda vem do estresse mais leve da segunda base, mas mostra que 15 pessoas num único protocolo não bastam para um modelo de uso geral.
-3. **Previsão do próximo minuto:** o dataset não tem transições rotuladas, então a previsão é uma regra de tendência, não um modelo treinado. E ela quase não antecipa nada: na simulação, o **aviso antecipado saiu só 9 vezes** em 1442 minutos (contra 367 respirações guiadas e 168 pausas ativas). A probabilidade de estresse costuma saltar de um minuto para o outro (em 10% das trocas, o salto passa de 44 pontos), cruzando o limiar antes que a tendência perceba a subida. Na prática, o sistema reage ao estresse no minuto em que ele aparece, não antes.
+3. **Previsão do próximo minuto:** o dataset não tem transições rotuladas, então a previsão é uma regra de tendência, não um modelo treinado. E ela quase não antecipa nada: na simulação, o **aviso antecipado saiu só 9 vezes** em 1442 minutos (contra 229 respirações guiadas e 168 pausas ativas). A probabilidade de estresse costuma saltar de um minuto para o outro (em 10% das trocas, o salto passa de 44 pontos), cruzando o limiar antes que a tendência perceba a subida. Na prática, o sistema reage ao estresse no minuto em que ele aparece, não antes.
 4. **Temperatura e tempo de sessão:** no WESAD, o estresse sempre vem depois do repouso, e a temperatura da pele cai ao longo da sessão (repouso 33,6 °C; estresse e diversão, que vêm depois, 32,8 °C). Parte do peso da temperatura no modelo pode ser "tempo de sessão", e não fisiologia.
 5. **Variabilidade cardíaca no punho:** ruidosa demais para separar as condições (seção 3).
 6. **Diversão:** confundida com repouso (F1 62).
@@ -205,6 +224,7 @@ Na raiz do repositório, com o WESAD em `WESAD/` e as dependências de `treino/r
 python -m treino.preparar_wesad   # janelas e features do WESAD   (~20 s)
 python -m treino.treinar          # validação, modelo e gráficos   (~20 s)
 python -m treino.simular_api      # uso real simulado pela API     (~2 min)
+python -m treino.comparar_modelos # comparação de modelos          (~45 s)
 ```
 
 Para a segunda base, baixe o ZIP do PhysioNet (70 MB, link nas referências), descompacte numa pasta própria dentro de `data/` (fora do Git) e rode:
