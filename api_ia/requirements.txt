@@ -1,3 +1,7 @@
 fastapi==0.165.0
 pydantic==2.14.4
 uvicorn==0.54.0
+# Mesmas versões do treino: o modelo salvo só abre com versões compatíveis.
+numpy==2.3.5
+scipy==1.16.3
+scikit-learn==1.9.1

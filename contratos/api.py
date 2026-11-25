@@ -40,11 +40,15 @@ class Features(BaseModel):
     hrv_rmssd: float = Field(..., ge=0, description="Variabilidade cardíaca, RMSSD (ms)")
     hrv_sdnn: float = Field(..., ge=0, description="Variabilidade cardíaca, SDNN (ms)")
     eda_media: float = Field(..., ge=0, description="Condutância média da pele (µS)")
-    eda_picos: int = Field(..., ge=0, description="Número de picos de condutância na janela")
+    eda_picos: int = Field(
+        ..., ge=0, description="Número de respostas de condutância na janela (picos de 0,01 µS ou mais)"
+    )
     eda_inclinacao: float = Field(..., description="Tendência da condutância na janela (µS/min)")
     temp_media: float = Field(..., description="Temperatura média da pele (°C)")
     temp_inclinacao: float = Field(..., description="Tendência da temperatura na janela (°C/min)")
-    movimento_media: float = Field(..., ge=0, description="Magnitude média da aceleração (g)")
+    movimento_media: float = Field(
+        ..., ge=0, description="Aceleração média descontada a gravidade, |magnitude - 1 g| (g)"
+    )
 
 
 class JanelaFeatures(BaseModel):
