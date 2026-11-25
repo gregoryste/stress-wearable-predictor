@@ -1,0 +1,69 @@
+{
+  "versao": "rf-v1-20261125",
+  "criado_em": "2026-11-25T02:32:46+00:00",
+  "arquivo": "modelo_estresse.joblib",
+  "features": [
+    "fc_media",
+    "fc_desvio",
+    "hrv_rmssd",
+    "hrv_sdnn",
+    "eda_media",
+    "eda_picos",
+    "eda_inclinacao",
+    "temp_media",
+    "temp_inclinacao",
+    "movimento_media"
+  ],
+  "classes": [
+    "diversao",
+    "estresse",
+    "repouso"
+  ],
+  "variantes": {
+    "geral": "features como medidas; serve para qualquer usuário",
+    "pessoal": "feature menos a média do repouso de calibração do usuário; exige calibração"
+  },
+  "usuarios_calibrados": [
+    "S2",
+    "S3",
+    "S4",
+    "S5",
+    "S6",
+    "S7",
+    "S8",
+    "S9",
+    "S10",
+    "S11",
+    "S13",
+    "S14",
+    "S15",
+    "S16",
+    "S17"
+  ],
+  "parametros": {
+    "modelo": "RandomForestClassifier",
+    "n_arvores": 300,
+    "folha_minima": 3,
+    "class_weight": "balanced",
+    "semente": 42,
+    "janela_s": 60,
+    "calibracao_s": 300
+  },
+  "metricas_loso": {
+    "geral": {
+      "f1_macro": 67.78,
+      "acuracia": 73.7
+    },
+    "pessoal": {
+      "f1_macro": 81.89,
+      "acuracia": 86.6
+    }
+  },
+  "versoes": {
+    "python": "3.14.7",
+    "scikit-learn": "1.9.1",
+    "numpy": "2.3.5",
+    "scipy": "1.16.3",
+    "joblib": "1.6.0"
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "versao_modelo": "rf-v1-20261125",
+  "gerado_em": "2026-11-25T02:32:46+00:00",
+  "dados": {
+    "tabela": "data/features_wesad.csv",
+    "participantes": 15,
+    "janelas_total": 3039,
+    "janelas_calibracao": 375,
+    "janelas_fora_por_sobreposicao": 75,
+    "janelas_avaliadas": 2589,
+    "calibracao_s": 300
+  },
+  "validacao": "leave-one-subject-out (15 rodadas)",
+  "referencia": {
+    "fonte": "Schmidt et al. (2018), três classes, só pulso, LOSO",
+    "random_forest": {
+      "f1_macro": 62.86,
+      "acuracia": 74.85
+    },
+    "adaboost": {
+      "f1_macro": 64.12,
+      "acuracia": 75.21
+    }
+  },
+  "avaliacao": {
+    "geral": {
+      "janelas": 2589,
+      "f1_macro": 67.78,
+      "acuracia": 73.7,
+      "f1_por_classe": {
+        "repouso": 76.13,
+        "estresse": 85.45,
+        "diversao": 41.76
+      },
+      "binario_estresse": {
+        "f1_estresse": 85.45,
+        "acuracia": 89.73
+      },
+      "matriz_confusao": {
+        "ordem": [
+          "repouso",
+          "estresse",
+          "diversao"
+        ],
+        "valores": [
+          [
+            947,
+            114,
+            160
+          ],
+          [
+            65,
+            781,
+            57
+          ],
+          [
+            255,
+            30,
+            180
+          ]
+        ]
+      },
+      "f1_por_participante": {
+        "S2": 59.97,
+        "S3": 76.14,
+        "S4": 60.22,
+        "S5": 61.47,
+        "S6": 75.33,
+        "S7": 53.42,
+        "S8": 55.16,
+        "S9": 92.73,
+        "S10": 24.52,
+        "S11": 88.69,
+        "S13": 61.22,
+        "S14": 27.5,
+        "S15": 78.17,
+        "S16": 79.38,
+        "S17": 56.73
+      }
+    },
+    "pessoal": {
+      "janelas": 2589,
+      "f1_macro": 81.89,
+      "acuracia": 86.6,
+      "f1_por_classe": {
+        "repouso": 90.24,
+        "estresse": 93.04,
+        "diversao": 62.4
+      },
+      "binario_estresse": {
+        "f1_estresse": 93.04,
+        "acuracia": 95.13
+      },
+      "matriz_confusao": {
+        "ordem": [
+          "repouso",
+          "estresse",
+          "diversao"
+        ],
+        "valores": [
+          [
+            1132,
+            9,
+            80
+          ],
+          [
+            15,
+            842,
+            46
+          ],
+          [
+            141,
+            56,
+            268
+          ]
+        ]
+      },
+      "f1_por_participante": {
+        "S2": 74.02,
+        "S3": 77.04,
+        "S4": 65.59,
+        "S5": 100.0,
+        "S6": 84.54,
+        "S7": 70.91,
+        "S8": 81.77,
+        "S9": 97.89,
+        "S10": 61.37,
+        "S11": 100.0,
+        "S13": 61.22,
+        "S14": 78.29,
+        "S15": 83.59,
+        "S16": 72.37,
+        "S17": 76.69
+      }
+    }
+  },
+  "proxima_janela": {
+    "pares": 2318,
+    "pares_com_mudanca_de_estado": 0,
+    "regra_repetir_estado_real": {
+      "janelas": 2318,
+      "f1_macro": 100.0,
+      "acuracia": 100.0
+    },
+    "regra_repetir_estado_previsto": {
+      "janelas": 2318,
+      "f1_macro": 82.07,
+      "acuracia": 87.66
+    },
+    "modelo_dedicado": {
+      "janelas": 2318,
+      "f1_macro": 82.07,
+      "acuracia": 87.62
+    }
+  },
+  "importancia_features_pessoal": {
+    "fc_media": 0.1603,
+    "fc_desvio": 0.0637,
+    "hrv_rmssd": 0.0244,
+    "hrv_sdnn": 0.0308,
+    "eda_media": 0.2373,
+    "eda_picos": 0.153,
+    "eda_inclinacao": 0.0489,
+    "temp_media": 0.2011,
+    "temp_inclinacao": 0.0375,
+    "movimento_media": 0.0431
+  },
+  "importancia_tipo": "redução média de impureza (MDI) do Random Forest"
+}
