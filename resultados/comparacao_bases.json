@@ -87,5 +87,144 @@
       "f1_estresse_physionet": 49.2,
       "exercicio_chamado_de_estresse_pct": 84.5
     }
-  ]
+  ],
+  "entre_bases": {
+    "participantes": {
+      "wesad": 15,
+      "physionet": 33,
+      "stress_predict": 34
+    },
+    "janelas": {
+      "wesad": {
+        "repouso": 1221,
+        "estresse": 903,
+        "diversao": 465
+      },
+      "physionet": {
+        "repouso": 3343,
+        "estresse": 863
+      },
+      "stress_predict": {
+        "repouso": 5801,
+        "estresse": 3128
+      }
+    },
+    "dentro_da_base": {
+      "wesad": {
+        "janelas": 2589,
+        "f1_estresse": 93.0,
+        "acuracia_balanceada": 94.7,
+        "auc": 0.992
+      },
+      "physionet": {
+        "janelas": 4206,
+        "f1_estresse": 56.2,
+        "acuracia_balanceada": 73.6,
+        "auc": 0.802
+      },
+      "stress_predict": {
+        "janelas": 8929,
+        "f1_estresse": 59.2,
+        "acuracia_balanceada": 68.8,
+        "auc": 0.751
+      }
+    },
+    "base_nunca_vista": [
+      {
+        "treino": "physionet",
+        "teste": "wesad",
+        "janelas": 2589,
+        "f1_estresse": 63.5,
+        "acuracia_balanceada": 69.7,
+        "auc": 0.77
+      },
+      {
+        "treino": "stress_predict",
+        "teste": "wesad",
+        "janelas": 2589,
+        "f1_estresse": 67.1,
+        "acuracia_balanceada": 74.8,
+        "auc": 0.793
+      },
+      {
+        "treino": "physionet + stress_predict",
+        "teste": "wesad",
+        "janelas": 2589,
+        "f1_estresse": 62.6,
+        "acuracia_balanceada": 70.8,
+        "auc": 0.771
+      },
+      {
+        "treino": "wesad",
+        "teste": "physionet",
+        "janelas": 4206,
+        "f1_estresse": 37.8,
+        "acuracia_balanceada": 60.4,
+        "auc": 0.629,
+        "exercicio_chamado_de_estresse_pct": 90.8
+      },
+      {
+        "treino": "stress_predict",
+        "teste": "physionet",
+        "janelas": 4206,
+        "f1_estresse": 46.9,
+        "acuracia_balanceada": 67.0,
+        "auc": 0.753,
+        "exercicio_chamado_de_estresse_pct": 54.1
+      },
+      {
+        "treino": "wesad + stress_predict",
+        "teste": "physionet",
+        "janelas": 4206,
+        "f1_estresse": 44.9,
+        "acuracia_balanceada": 65.4,
+        "auc": 0.735,
+        "exercicio_chamado_de_estresse_pct": 68.1
+      },
+      {
+        "treino": "wesad",
+        "teste": "stress_predict",
+        "janelas": 8929,
+        "f1_estresse": 43.8,
+        "acuracia_balanceada": 56.5,
+        "auc": 0.593
+      },
+      {
+        "treino": "physionet",
+        "teste": "stress_predict",
+        "janelas": 8929,
+        "f1_estresse": 58.3,
+        "acuracia_balanceada": 67.4,
+        "auc": 0.735
+      },
+      {
+        "treino": "wesad + physionet",
+        "teste": "stress_predict",
+        "janelas": 8929,
+        "f1_estresse": 53.0,
+        "acuracia_balanceada": 64.3,
+        "auc": 0.693
+      }
+    ],
+    "todas_juntas_loso": {
+      "wesad": {
+        "janelas": 2589,
+        "f1_estresse": 78.7,
+        "acuracia_balanceada": 84.2,
+        "auc": 0.915
+      },
+      "physionet": {
+        "janelas": 4206,
+        "f1_estresse": 49.5,
+        "acuracia_balanceada": 68.4,
+        "auc": 0.785
+      },
+      "stress_predict": {
+        "janelas": 8929,
+        "f1_estresse": 57.9,
+        "acuracia_balanceada": 67.9,
+        "auc": 0.752
+      }
+    }
+  }
 }
