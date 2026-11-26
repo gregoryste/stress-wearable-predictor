@@ -1,0 +1,17 @@
+services:
+  janelas:
+    build:
+      context: .
+      dockerfile: ingestao/janelas/Dockerfile
+    restart: unless-stopped
+    environment:
+      PGHOST: banco
+      PGDATABASE: iot
+      PGUSER: jackson
+      PGPASSWORD: "${POSTGRES_PASSWORD:?Configure a senha no .env}"
+      API_PREVER_URL: http://api-ia:8000/prever
+    depends_on:
+      banco:
+        condition: service_healthy
+      api-ia:
+        condition: service_healthy
