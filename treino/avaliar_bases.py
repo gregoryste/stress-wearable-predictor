@@ -1,20 +1,28 @@
-"""Compara o modelo treinado só no WESAD com um modelo que usa as duas bases.
+"""Compara modelos treinados em bases diferentes (WESAD, PhysioNet e Stress-Predict).
 
-Perguntas:
+Perguntas sobre WESAD e PhysioNet:
 1. Teste cruzado: um modelo treinado numa base funciona na outra?
 2. Exercício: quanto o modelo atual (só WESAD) confunde exercício com estresse?
 3. Modelo combinado (WESAD + PhysioNet, com a classe "exercicio"), avaliado com
    leave-one-subject-out nas duas bases: o falso alarme no exercício cai sem perder
    a detecção de estresse?
 
+Com a terceira base (Stress-Predict), sem a classe "exercicio":
+4. Dentro de cada base (leave-one-subject-out), qual o desempenho de referência?
+5. Treinando em uma ou duas bases e testando numa base que o modelo nunca viu,
+   juntar bases melhora a generalização?
+6. Com as três bases juntas (leave-one-subject-out), cada base melhora ou piora em
+   relação ao modelo treinado só nela?
+
 Todas as variantes usam o padrão pessoal (diferença para a calibração de cada
 participante); as janelas de calibração ficam fora da avaliação.
 
-Uso (na raiz, depois de preparar as duas bases):
+Uso (na raiz, depois de preparar as bases; o Stress-Predict é opcional):
     python -m treino.avaliar_bases
 """
 
 import argparse
+import itertools
 import json
 from pathlib import Path
 
@@ -26,13 +34,20 @@ from sklearn.model_selection import LeaveOneGroupOut, cross_val_predict
 from treino.treinar import FEATURES, estatisticas_calibracao, marcar_calibracao, normalizar, novo_modelo
 
 
-def carregar(tabela_wesad: Path, tabela_physionet: Path) -> pd.DataFrame:
+BASES = ("wesad", "physionet", "stress_predict")
+# Nome das condições do WESAD no arquivo de questionários (SX_quest.csv).
+FASES_WESAD = {"repouso": "Base", "estresse": "TSST", "diversao": "Fun"}
+
+
+def carregar(tabela_wesad: Path, tabela_physionet: Path, tabela_stress_predict: Path | None = None) -> pd.DataFrame:
     wesad = pd.read_csv(tabela_wesad)
     calibracao, sobreposta = marcar_calibracao(wesad)
-    wesad = wesad.assign(base="wesad", sessao="WESAD", calibracao=calibracao, fora=sobreposta)
-    physionet = pd.read_csv(tabela_physionet).assign(fora=False)
-    colunas = ["participante", "base", "sessao", "estado", "calibracao", "fora"] + FEATURES
-    dados = pd.concat([wesad[colunas], physionet[colunas]], ignore_index=True)
+    wesad = wesad.assign(base="wesad", sessao="WESAD", fase=wesad.estado.map(FASES_WESAD),
+                         calibracao=calibracao, fora=sobreposta)
+    # As outras bases já trazem a calibração marcada pelo preparador.
+    outras = [pd.read_csv(t).assign(fora=False) for t in (tabela_physionet, tabela_stress_predict) if t is not None]
+    colunas = ["participante", "base", "sessao", "fase", "estado", "calibracao", "fora"] + FEATURES
+    dados = pd.concat([wesad[colunas]] + [o[colunas] for o in outras], ignore_index=True)
 
     # Padrão pessoal: só participantes com calibração (no PhysioNet, quem tem a sessão de estresse).
     estatisticas = estatisticas_calibracao(dados, dados.calibracao.astype(bool))
@@ -138,10 +153,61 @@ def avaliar(dados: pd.DataFrame, n_arvores: int) -> dict:
     return resultado
 
 
+def avaliar_entre_bases(dados: pd.DataFrame, n_arvores: int) -> dict:
+    """Perguntas 4 a 6: generalização entre bases, sem a classe exercício.
+
+    Nos testes no PhysioNet, também mede quanto do exercício (nunca visto no treino)
+    o modelo chama de estresse.
+    """
+    exercicio = dados[dados.estado == "exercicio"]
+    dados = dados[dados.estado != "exercicio"].reset_index(drop=True)
+    bases = [b for b in BASES if b in set(dados.base)]
+    por_base = {b: dados[dados.base == b] for b in bases}
+    logo = LeaveOneGroupOut()
+
+    def loso(conjunto: pd.DataFrame) -> pd.DataFrame:
+        probabilidades = cross_val_predict(novo_modelo(n_arvores), conjunto[FEATURES], conjunto.estado,
+                                           groups=conjunto.participante, cv=logo, method="predict_proba")
+        return pd.DataFrame(probabilidades, columns=sorted(conjunto.estado.unique()), index=conjunto.index)
+
+    def medir(verdadeiro, probabilidades: pd.DataFrame) -> dict:
+        return binario(verdadeiro, probabilidades.idxmax(axis=1), probabilidades.estresse)
+
+    resultado = {
+        "participantes": {b: int(g.participante.nunique()) for b, g in por_base.items()},
+        "janelas": {b: g.estado.value_counts().to_dict() for b, g in por_base.items()},
+        "dentro_da_base": {b: medir(g.estado, loso(g)) for b, g in por_base.items()},
+        "base_nunca_vista": [],
+    }
+
+    for teste in bases:
+        outras = [b for b in bases if b != teste]
+        X_teste = por_base[teste][FEATURES].to_numpy()
+        for tamanho in range(1, len(outras) + 1):
+            for treino in itertools.combinations(outras, tamanho):
+                conjunto = dados[dados.base.isin(treino)]
+                modelo = novo_modelo(n_arvores).fit(conjunto[FEATURES].to_numpy(), conjunto.estado.to_numpy())
+                medida = {
+                    "treino": " + ".join(treino),
+                    "teste": teste,
+                    **binario(por_base[teste].estado, modelo.predict(X_teste), prob_classe(modelo, X_teste, "estresse")),
+                }
+                if teste == "physionet" and len(exercicio):
+                    previsto = modelo.predict(exercicio[FEATURES].to_numpy())
+                    medida["exercicio_chamado_de_estresse_pct"] = round(100 * float(np.mean(previsto == "estresse")), 1)
+                resultado["base_nunca_vista"].append(medida)
+
+    todas = loso(dados)
+    resultado["todas_juntas_loso"] = {b: medir(g.estado, todas.loc[g.index]) for b, g in por_base.items()}
+    return resultado
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--wesad", type=Path, default=Path("data/features_wesad.csv"))
     parser.add_argument("--physionet", type=Path, default=Path("data/features_physionet.csv"))
+    parser.add_argument("--stress-predict", type=Path, default=Path("data/features_stress_predict.csv"),
+                        help="tabela do Stress-Predict; se não existir, as perguntas 4 a 6 ficam de fora")
     parser.add_argument("--saida", type=Path, default=Path("resultados/comparacao_bases.json"))
     parser.add_argument("--arvores", type=int, default=300)
     args = parser.parse_args()
@@ -149,7 +215,14 @@ def main() -> None:
         if not tabela.exists():
             parser.error(f"{tabela} não existe. Rode antes: python -m {comando}")
 
-    resultado = avaliar(carregar(args.wesad, args.physionet), args.arvores)
+    stress_predict = args.stress_predict if args.stress_predict.exists() else None
+    dados = carregar(args.wesad, args.physionet, stress_predict)
+    # Perguntas 1 a 3: só WESAD e PhysioNet, como na primeira comparação.
+    resultado = avaliar(dados[dados.base != "stress_predict"].reset_index(drop=True), args.arvores)
+    if stress_predict is not None:
+        resultado["entre_bases"] = avaliar_entre_bases(dados, args.arvores)
+    else:
+        print(f"{args.stress_predict} não existe: perguntas 4 a 6 puladas (python -m treino.preparar_stress_predict)")
     args.saida.parent.mkdir(parents=True, exist_ok=True)
     args.saida.write_text(json.dumps(resultado, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(resultado, ensure_ascii=False, indent=2))

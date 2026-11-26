@@ -1,0 +1,309 @@
+{
+  "physionet": {
+    "participantes": 33,
+    "por_fase": {
+      "First Rest": {
+        "pessoas": 33,
+        "estado_no_protocolo": "repouso",
+        "relato_medio": 3.03,
+        "relato_acima_da_linha_de_base_pct": 27.3,
+        "delta_fc_medio": -5.8,
+        "delta_eda_medio": 0.18,
+        "prob_estresse_media": 0.27,
+        "janelas_com_alerta_pct": 28.2
+      },
+      "Opinioes e contas": {
+        "pessoas": 17,
+        "estado_no_protocolo": "estresse",
+        "relato_medio": 4.32,
+        "relato_acima_da_linha_de_base_pct": 58.8,
+        "delta_fc_medio": 4.8,
+        "delta_eda_medio": 1.13,
+        "prob_estresse_media": 0.52,
+        "janelas_com_alerta_pct": 54.5
+      },
+      "Second Rest": {
+        "pessoas": 33,
+        "estado_no_protocolo": "repouso",
+        "relato_medio": 3.18,
+        "relato_acima_da_linha_de_base_pct": 27.3,
+        "delta_fc_medio": -6.3,
+        "delta_eda_medio": -0.45,
+        "prob_estresse_media": 0.27,
+        "janelas_com_alerta_pct": 27.7
+      },
+      "Stroop": {
+        "pessoas": 17,
+        "estado_no_protocolo": "estresse",
+        "relato_medio": 3.97,
+        "relato_acima_da_linha_de_base_pct": 58.8,
+        "delta_fc_medio": 6.5,
+        "delta_eda_medio": 1.14,
+        "prob_estresse_media": 0.53,
+        "janelas_com_alerta_pct": 58.8
+      },
+      "TMCT": {
+        "pessoas": 33,
+        "estado_no_protocolo": "estresse",
+        "relato_medio": 5.83,
+        "relato_acima_da_linha_de_base_pct": 90.9,
+        "delta_fc_medio": 3.9,
+        "delta_eda_medio": 0.61,
+        "prob_estresse_media": 0.37,
+        "janelas_com_alerta_pct": 36.1
+      },
+      "Opinioes": {
+        "pessoas": 16,
+        "estado_no_protocolo": "estresse",
+        "relato_medio": 3.91,
+        "relato_acima_da_linha_de_base_pct": 37.5,
+        "delta_fc_medio": 2.9,
+        "delta_eda_medio": -0.8,
+        "prob_estresse_media": 0.36,
+        "janelas_com_alerta_pct": 41.2
+      }
+    },
+    "fases_de_estresse_com_relato_acima_da_linha_de_base_pct": 67.5,
+    "outras_fases_com_relato_acima_da_linha_de_base_pct": 27.3,
+    "correlacao_dentro_da_pessoa": {
+      "protocolo_estresse x relato": {
+        "rho": 0.56,
+        "p": 1.3e-13,
+        "n": 149
+      },
+      "protocolo_estresse x delta_fc": {
+        "rho": 0.7,
+        "p": 1.1e-23,
+        "n": 149
+      },
+      "protocolo_estresse x delta_eda": {
+        "rho": 0.24,
+        "p": 0.0037,
+        "n": 149
+      },
+      "protocolo_estresse x prob_modelo_wesad": {
+        "rho": 0.36,
+        "p": 6.8e-06,
+        "n": 149
+      },
+      "protocolo_estresse x prob_modelo_da_base": {
+        "rho": 0.66,
+        "p": 2.7e-20,
+        "n": 149
+      },
+      "relato x delta_fc": {
+        "rho": 0.5,
+        "p": 6.2e-11,
+        "n": 149
+      },
+      "relato x delta_eda": {
+        "rho": 0.17,
+        "p": 0.044,
+        "n": 149
+      },
+      "relato x prob_modelo_wesad": {
+        "rho": 0.22,
+        "p": 0.0067,
+        "n": 149
+      },
+      "relato x prob_modelo_da_base": {
+        "rho": 0.52,
+        "p": 8.8e-12,
+        "n": 149
+      },
+      "delta_fc x delta_eda": {
+        "rho": 0.28,
+        "p": 0.00061,
+        "n": 149
+      },
+      "delta_fc x prob_modelo_wesad": {
+        "rho": 0.53,
+        "p": 3.8e-12,
+        "n": 149
+      },
+      "delta_fc x prob_modelo_da_base": {
+        "rho": 0.82,
+        "p": 1.3e-37,
+        "n": 149
+      },
+      "delta_eda x prob_modelo_wesad": {
+        "rho": 0.56,
+        "p": 1.7e-13,
+        "n": 149
+      },
+      "delta_eda x prob_modelo_da_base": {
+        "rho": 0.25,
+        "p": 0.0024,
+        "n": 149
+      },
+      "prob_modelo_wesad x prob_modelo_da_base": {
+        "rho": 0.48,
+        "p": 5.1e-10,
+        "n": 149
+      }
+    },
+    "por_relato": {
+      "fases_de_estresse": {
+        "relato_acima_da_linha_de_base": {
+          "fases": 56,
+          "janelas_com_alerta_pct": 44.2,
+          "delta_fc_medio": 3.8,
+          "delta_eda_medio": 0.61
+        },
+        "relato_igual_ou_abaixo": {
+          "fases": 27,
+          "janelas_com_alerta_pct": 48.4,
+          "delta_fc_medio": 5.7,
+          "delta_eda_medio": 0.43
+        }
+      },
+      "outras_fases": {
+        "relato_acima_da_linha_de_base": {
+          "fases": 18,
+          "janelas_com_alerta_pct": 23.0,
+          "delta_fc_medio": -7.3,
+          "delta_eda_medio": 0.6
+        },
+        "relato_igual_ou_abaixo": {
+          "fases": 48,
+          "janelas_com_alerta_pct": 29.8,
+          "delta_fc_medio": -5.6,
+          "delta_eda_medio": -0.41
+        }
+      }
+    }
+  },
+  "wesad": {
+    "participantes": 15,
+    "por_fase": {
+      "Base": {
+        "pessoas": 15,
+        "estado_no_protocolo": "repouso",
+        "relato_medio": 1.53,
+        "relato_acima_da_linha_de_base_pct": 0.0,
+        "delta_fc_medio": 0.4,
+        "delta_eda_medio": -0.76,
+        "prob_estresse_media": 0.03,
+        "janelas_com_alerta_pct": 0.6
+      },
+      "Fun": {
+        "pessoas": 15,
+        "estado_no_protocolo": "diversao",
+        "relato_medio": 1.07,
+        "relato_acima_da_linha_de_base_pct": 0.0,
+        "delta_fc_medio": 0.6,
+        "delta_eda_medio": -0.51,
+        "prob_estresse_media": 0.15,
+        "janelas_com_alerta_pct": 7.7
+      },
+      "TSST": {
+        "pessoas": 15,
+        "estado_no_protocolo": "estresse",
+        "relato_medio": 3.53,
+        "relato_acima_da_linha_de_base_pct": 86.7,
+        "delta_fc_medio": 24.3,
+        "delta_eda_medio": 1.6,
+        "prob_estresse_media": 0.82,
+        "janelas_com_alerta_pct": 87.1
+      }
+    },
+    "fases_de_estresse_com_relato_acima_da_linha_de_base_pct": 86.7,
+    "outras_fases_com_relato_acima_da_linha_de_base_pct": 0.0,
+    "correlacao_dentro_da_pessoa": {
+      "protocolo_estresse x relato": {
+        "rho": 0.81,
+        "p": 1.1e-11,
+        "n": 45
+      },
+      "protocolo_estresse x delta_fc": {
+        "rho": 0.81,
+        "p": 1.2e-11,
+        "n": 45
+      },
+      "protocolo_estresse x delta_eda": {
+        "rho": 0.8,
+        "p": 3.5e-11,
+        "n": 45
+      },
+      "protocolo_estresse x prob_modelo_wesad": {
+        "rho": 0.82,
+        "p": 7.9e-12,
+        "n": 45
+      },
+      "relato x delta_fc": {
+        "rho": 0.78,
+        "p": 3.9e-10,
+        "n": 45
+      },
+      "relato x delta_eda": {
+        "rho": 0.59,
+        "p": 1.7e-05,
+        "n": 45
+      },
+      "relato x prob_modelo_wesad": {
+        "rho": 0.53,
+        "p": 0.00016,
+        "n": 45
+      },
+      "delta_fc x delta_eda": {
+        "rho": 0.59,
+        "p": 2.4e-05,
+        "n": 45
+      },
+      "delta_fc x prob_modelo_wesad": {
+        "rho": 0.69,
+        "p": 1.5e-07,
+        "n": 45
+      },
+      "delta_eda x prob_modelo_wesad": {
+        "rho": 0.81,
+        "p": 1.6e-11,
+        "n": 45
+      }
+    },
+    "por_relato": {
+      "fases_de_estresse": {
+        "relato_acima_da_linha_de_base": {
+          "fases": 13,
+          "janelas_com_alerta_pct": 85.3,
+          "delta_fc_medio": 26.7,
+          "delta_eda_medio": 1.23
+        },
+        "relato_igual_ou_abaixo": {
+          "fases": 2,
+          "janelas_com_alerta_pct": 98.3,
+          "delta_fc_medio": 8.4,
+          "delta_eda_medio": 3.99
+        }
+      },
+      "outras_fases": {
+        "relato_igual_ou_abaixo": {
+          "fases": 15,
+          "janelas_com_alerta_pct": 7.7,
+          "delta_fc_medio": 0.6,
+          "delta_eda_medio": -0.51
+        }
+      }
+    },
+    "questionarios_por_fase": {
+      "Base": {
+        "relato": 1.53,
+        "ansiedade_stai": 35.99,
+        "ativacao_sam": 2.53,
+        "valencia_sam": 6.67
+      },
+      "Fun": {
+        "relato": 1.07,
+        "ansiedade_stai": 30.89,
+        "ativacao_sam": 3.0,
+        "valencia_sam": 7.47
+      },
+      "TSST": {
+        "relato": 3.53,
+        "ansiedade_stai": 61.78,
+        "ativacao_sam": 6.8,
+        "valencia_sam": 4.53
+      }
+    }
+  }
+}
